@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legend Sword - 전설의 검: 방치형 대장장이 RPG</title>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" type="image/png" href="./assets/images/appIcon.png">
+    <link rel="apple-touch-icon" href="./assets/images/appIcon.png">
+    <style>
+        :root {
+            --primary: #FFD700;
+            --secondary: #4b0082;
+            --bg: #0f0c29;
+            --text: #ffffff;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.6;
+            text-align: center;
+        }
+        header {
+            padding: 80px 20px;
+        }
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(to right, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        .tagline {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-top: 10px;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 15px 40px;
+            background: var(--primary);
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: transform 0.3s;
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+        }
+        .content-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: left;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,215,0,0.1);
+        }
+        .media-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        footer {
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.3);
+            font-size: 0.9rem;
+            color: #888;
+        }
+        a { color: var(--primary); text-decoration: none; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #1a1a2e;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid var(--primary);
+            width: 90%;
+            max-width: 700px;
+            border-radius: 20px;
+            text-align: left;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255,215,0,0.2);
+        }
+        .close-modal {
+            color: var(--primary);
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <!-- 프로젝트 폴더 내의 이미지를 직접 사용합니다 -->
+    <img src="./assets/images/appIcon.png" alt="Legend Sword Logo" class="logo" onerror="this.style.display='none'">
+    <h1>LEGEND SWORD</h1>
+    <p class="tagline">당신만의 전설을 제련하세요. 무한 성장 방치형 클리커 RPG</p>
+    
+    <a href="https://play.google.com/store/apps/details?id=kr.niee.legendsword" class="download-btn">Google Play에서 다운로드</a>
+</header>
+
+<div class="content-section">
+    <h2>Game Features</h2>
+    <div class="features">
+        <div class="feature-card">
+            <h3>⚔️ 무한 각성</h3>
+            <p>레벨업을 통해 더욱 강력한 전설의 검을 수집하세요.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🧩 전설의 제련소</h3>
+            <p>매치-3 퍼즐과 레이드의 결합! 최고의 데미지에 도전하세요.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🏆 글로벌 랭킹</h3>
+            <p>전 세계 대장장이들과 레벨 및 수집 점수를 겨루세요.</p>
+        </div>
+    </div>
+
+    <!-- Media Section (YouTube Only) -->
+    <div class="media-section">
+        <h2>Gameplay Video</h2>
+        <div class="video-container">
+            <!-- 유튜브 영상 ID를 'YOUR_VIDEO_ID' 자리에 넣으세요 -->
+            <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div id="privacyModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2>Privacy Policy for Legend Sword</h2>
+        <p><strong>최종 수정일: 2026년 02월 15일</strong></p>
+        <p>본 개인정보 처리방침은 '레전드 소드'(이하 "앱")가 이용자의 정보를 어떻게 관리하는지 설명합니다.</p>
+        
+        <h3>1. 개요</h3>
+        <p>본 앱은 별도의 개인 서버를 운영하지 않으며, 이용자의 개인정보를 직접 수집하거나 저장하지 않습니다. 모든 게임 데이터(진행도, 랭킹 등)는 구글 플레이 게임 서비스를 통해 관리되며, 광고는 구글 애드몹을 통해 제공됩니다.</p>
+        
+        <h3>2. 정보 수집 및 이용 항목</h3>
+        <p>앱의 원활한 서비스 제공을 위해 다음과 같은 제3자 서비스를 사용하며, 해당 서비스에서 정보가 수집될 수 있습니다.</p>
+        <ul>
+            <li>Google Play Services: 게임 데이터 클라우드 저장, 리더보드, 업적 관리.</li>
+            <li>Google AdMob: 맞춤형 광고 제공 및 광고 ID 수집.</li>
+            <li>인앱 결제: 결제 처리 및 구매 내역 확인.</li>
+        </ul>
+
+        <h3>3. 로그 데이터</h3>
+        <p>앱 오류 발생 시, 오류 원인 파악을 위해 기기 정보가 포함된 로그 데이터가 제3자 도구를 통해 수집될 수 있습니다.</p>
+
+        <h3>4. 개인정보의 파기</h3>
+        <p>본 앱은 직접 정보를 수집하지 않으므로 파기할 정보가 없습니다.</p>
+
+        <h3>5. 문의처</h3>
+        <p>이메일: smartmingue@gmail.com</p>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 ParkMinKyu. All rights reserved.<br>
+    Contact: <a href="mailto:smartmingue@gmail.com">smartmingue@gmail.com</a><br>
+    <a href="javascript:void(0)" onclick="openModal()" style="font-size: 0.8rem; opacity: 0.7; text-decoration: underline; margin-top: 10px; display: inline-block;">개인정보 처리방침 (Privacy Policy)</a>
+</footer>
+
+<script>
+    function openModal() {
+        document.getElementById('privacyModal').style.display = "block";
+        document.body.style.overflow = "hidden"; // 배경 스크롤 방지
+    }
+
+    function closeModal() {
+        document.getElementById('privacyModal').style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    // 모달 바깥쪽 클릭 시 닫기
+    window.onclick = function(event) {
+        var modal = document.getElementById('privacyModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+</body>
+</html>
+
+</body>
+</html>
