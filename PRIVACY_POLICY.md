@@ -23,7 +23,7 @@ These Services do not address anyone under the age of 13. We do not knowingly co
 
 ## 5. Contact Us
 If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us.
-*   **Email**: niee@naver.com
+*   **Email**: smartmingue@gmail.com
 
 ---
 
@@ -50,4 +50,4 @@ If you have any questions or suggestions about our Privacy Policy, do not hesita
 
 ## 5. 문의처
 개인정보 처리방침과 관련하여 문의 사항이 있으시면 아래로 연락해 주시기 바랍니다.
-*   **이메일**: niee@naver.com
+*   **이메일**: smartmingue@gmail.com
