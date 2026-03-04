@@ -257,8 +257,8 @@
 <footer>
     &copy; 2026 ParkMinKyu. All rights reserved.<br>
     Contact: <a href="mailto:smartmingue@gmail.com">smartmingue@gmail.com</a><br>
-    <a href="javascript:void(0)" onclick="openModal('privacyModal')" style="font-size: 0.8rem; opacity: 0.7; text-decoration: underline; margin-top: 10px; display: inline-block;">개인정보 처리방침 (Privacy Policy)</a>
-    <a href="javascript:void(0)" onclick="openModal('reModal')" style="font-size: 0.8rem; opacity: 0.7; text-decoration: underline; margin-top: 10px; display: inline-block;">환불 규정</a>
+    <a href="javascript:void(0)" onclick="openModal('reModal')" style="font-size: 0.8rem; opacity: 0.7; text-decoration: underline; margin-top: 10px; display: inline-block;">이용 약관</a> &nbsp;&nbsp;
+    <a href="javascript:void(0)" onclick="openModal('privacyModal')" style="font-size: 0.8rem; opacity: 0.7; text-decoration: underline; margin-top: 10px; display: inline-block;">개인정보 처리방침 (Privacy Policy)</a>    
 </footer>
 
 <script>
@@ -275,9 +275,12 @@
     // 모달 바깥쪽 클릭 시 닫기
     window.onclick = function(event) {
         var modal = document.getElementById('privacyModal');
-        var modal = document.getElementById('reModal');
         if (event.target == modal) {
-            closeModal();
+            closeModal('privacyModal');
+        }
+        modal = document.getElementById('reModal');
+        if (event.target == modal) {
+            closeModal('reModal');
         }
     }
 </script>
