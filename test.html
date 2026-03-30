@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>전설의 검: PvP 진검승부 (Modern Lobby)</title>
+    <style>
+        :root { --bg: #050505; --p1: #00ffff; --p2: #ff00ff; --accent: #ffcc00; --success: #00ffcc; --fail: #ff3333; }
+        body { margin: 0; padding: 0; background: #000; color: #eee; font-family: 'serif'; display: flex; justify-content: center; height: 100vh; overflow: hidden; user-select: none; touch-action: none; }
+        #phone { width: 100vw; max-width: 480px; height: 100vh; background: var(--bg); display: flex; flex-direction: column; border: 1px solid #222; position: relative; }
+        
+        /* 공통 그리드 스타일 */
+        .grid-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; position: relative; z-index: 10; }
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 95%; pointer-events: auto; }
+        .btn { background: #111; border: 1px solid #333; border-radius: 8px; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #444; transition: all 0.1s; pointer-events: auto; cursor: pointer; }
+        
+        #opp-grid-area { border-bottom: 1px solid #222; opacity: 0.8; }
+        #opp-grid .btn.active { border-color: var(--p2) !important; background: var(--p2) !important; box-shadow: 0 0 30px var(--p2) !important; color: #fff; transform: scale(1.1); }
+        #opp-grid .btn.wrong { background: var(--fail) !important; border-color: var(--fail) !important; }
+        
+        #mid-hub { height: 100px; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; border-top: 2px solid #333; border-bottom: 2px solid #333; position: relative; z-index: 20; }
+        #round-txt { font-size: 14px; font-weight: bold; color: var(--accent); letter-spacing: 3px; margin-bottom: 5px; }
+        #msg { font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        #hub-progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: #111; }
+        #hub-progress { position: absolute; bottom: 0; left: 0; height: 5px; background: var(--success); width: 0%; box-shadow: 0 0 10px var(--success); }
+        
+        .opp-score-box { position: absolute; left: 15px; top: 15px; text-align: left; z-index: 30; }
+        .my-score-box { position: absolute; right: 15px; bottom: 15px; text-align: right; z-index: 30; }
+        .score-val { font-size: 45px; font-weight: 900; line-height: 1; }
+        
+        .btn.flash { background: #fff !important; color: #000 !important; box-shadow: 0 0 40px #fff; transform: scale(1.15); z-index: 50; }
+        .btn.correct { background: var(--p1) !important; border-color: var(--p1) !important; color: #000 !important; box-shadow: 0 0 20px var(--p1); }
+        .btn.wrong { background: var(--fail) !important; border-color: var(--fail) !important; color: #fff; animation: shake 0.2s infinite; }
+
+        /* 로비 스타일 대규모 개편 */
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .input-std { padding: 18px; width: 80%; text-align: center; font-size: 22px; margin-bottom: 15px; background: #000; border: 2px solid var(--accent); color: #fff; border-radius: 12px; }
+        .btn-std { padding: 15px 60px; background: var(--accent); color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 12px; font-size: 18px; box-shadow: 0 0 20px rgba(255,204,0,0.3); }
+        
+        #room-list-container { width: 100%; max-width: 380px; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; flex: 1; overflow-y: auto; }
+        .room-item { 
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%); 
+            border: 1px solid #333; border-radius: 16px; padding: 20px; 
+            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+        .room-item:hover { border-color: var(--p1); transform: translateY(-3px); }
+        .arena-id { font-size: 20px; font-weight: 900; color: var(--accent); }
+        .arena-count { font-size: 12px; color: #888; margin-top: 4px; }
+        .btn-join-small { padding: 10px 25px; background: var(--p1); color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; }
+        .btn-full { background: #333; color: #666; cursor: default; }
+
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+        @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+        .animate-pop { animation: pop 0.4s ease-out; }
+    </style>
+</head>
+<body>
+<div id="phone">
+    <div id="opp-grid-area" class="grid-area">
+        <div class="opp-score-box"><div id="opp-name" style="font-size:10px; color:var(--p2);">ENEMY</div><div id="p2-score" class="score-val" style="color:var(--p2);">0</div></div>
+        <div id="opp-grid" class="grid-container"></div>
+    </div>
+    <div id="mid-hub">
+        <div id="round-txt">ROUND 1</div>
+        <div id="msg">CONNECTING...</div>
+        <div id="hub-progress-bg"><div id="hub-progress"></div></div>
+    </div>
+    <div id="my-grid-area" class="grid-area">
+        <div id="my-grid" class="grid-container"></div>
+        <div class="my-score-box"><div id="p1-score" class="score-val" style="color:var(--p1);">0</div><div id="my-name" style="font-size:10px; color:var(--p1);">YOU</div></div>
+    </div>
+
+    <!-- 등록 화면 -->
+    <div id="profile-overlay" class="overlay">
+        <h2 style="color:var(--accent); font-size: 32px; letter-spacing: 5px;">WARRIOR</h2>
+        <p style="font-size:12px; opacity:0.6; margin-bottom: 30px;">당신의 전설적인 이름을 입력하세요</p>
+        <input type="text" id="nick-input" class="input-std" placeholder="NICKNAME" maxlength="8">
+        <button class="btn-std" onclick="saveProfile()">CONFIRM</button>
+    </div>
+
+    <!-- 로비 화면 -->
+    <div id="room-overlay" class="overlay">
+        <div style="font-size:28px; font-weight:900; color:var(--accent); margin-bottom:5px;">ARENA LOBBY</div>
+        <div id="welcome-msg" style="font-size:12px; margin-bottom:30px; color:#666; letter-spacing: 2px;"></div>
+        
+        <input type="text" id="room-input" class="input-std" placeholder="ENTER ARENA CODE">
+        <button class="btn-std" onclick="joinRoom()">CREATE NEW ARENA</button>
+        
+        <div id="room-list-container">
+            <div style="font-size:10px; color:#444; margin-bottom:15px; letter-spacing:3px;">AVAILABLE BATTLES</div>
+            <div id="room-list"></div>
+        </div>
+    </div>
+</div>
+<script>
+    const runes = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ", "ᚺ", "ᚻ"];
+    let socket = null, myId = null, myGrid = [], oppGrid = [], currentSeq = [], myProgress = 0, isPlaying = false, roundTimer = null, listInterval = null;
+    let userProfile = JSON.parse(localStorage.getItem('legend_sword_profile') || '{"uuid":"","nickname":""}');
+
+    window.onload = () => { initGrids(); checkProfile(); };
+
+    function checkProfile() {
+        if (userProfile.nickname) showLobby();
+        else document.getElementById('profile-overlay').style.display = 'flex';
+    }
+
+    function saveProfile() {
+        const nick = document.getElementById('nick-input').value.trim();
+        if (!nick) return;
+        userProfile = { uuid: 'u-' + Date.now(), nickname: nick };
+        localStorage.setItem('legend_sword_profile', JSON.stringify(userProfile));
+        document.getElementById('profile-overlay').style.display = 'none';
+        showLobby();
+    }
+
+    function showLobby() {
+        document.getElementById('room-overlay').style.display = 'flex';
+        document.getElementById('welcome-msg').innerText = `WELCOME, ${userProfile.nickname} (${userProfile.uuid})`;
+        if(!socket) connectSocket();
+        if(listInterval) clearInterval(listInterval);
+        listInterval = setInterval(() => { if(socket?.readyState === 1 && document.getElementById('room-overlay').style.display !== 'none') socket.send(JSON.stringify({type:'GET_ROOM_LIST'})); }, 3000);
+    }
+
+    function connectSocket() {
+        socket = new WebSocket('ws://home.niee.kr:11444');
+        socket.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            const msg = document.getElementById('msg');
+            const progress = document.getElementById('hub-progress');
+
+            if(data.type === 'ROOM_LIST') renderRoomList(data.rooms);
+            if(data.type === 'INIT') { myId = data.id; document.getElementById('room-overlay').style.display='none'; document.getElementById('my-name').innerText = userProfile.nickname; }
+            if(data.type === 'PLAYER_SYNC') { const opp = data.players.find(p=>p.id!==myId); if(opp) document.getElementById('opp-name').innerText = opp.nickname; }
+            if(data.type === 'COUNTDOWN') {
+                document.getElementById('round-txt').innerText = `ROUND ${data.round} (${(4+data.round)} TARGETS)`;
+                if (data.seconds === 3) {
+                    progress.style.transition = 'none'; progress.style.width = '0%';
+                    setTimeout(() => { progress.style.transition = 'width 3000ms linear'; progress.style.width = '100%'; }, 50);
+                    clearGridEffects();
+                }
+                msg.innerText = data.seconds > 0 ? `START IN ${data.seconds}` : "GO!";
+            }
+            if(data.type === 'START_ROUND') {
+                document.getElementById('p1-score').innerText = myId===1?data.p1Score:data.p2Score;
+                document.getElementById('p2-score').innerText = myId===1?data.p2Score:data.p1Score;
+                renderRound(data);
+            }
+            if(data.type === 'REMOTE_TAP') { if(data.playerId !== myId) { const b = oppGrid[data.idx]; b.classList.add('active'); setTimeout(()=>b.classList.remove('active'), 200); } }
+            if(data.type === 'REMOTE_FAIL') { if(data.playerId !== myId) oppGrid[data.idx].classList.add('wrong'); }
+            if(data.type === 'ROUND_RESULT') {
+                isPlaying = false; if(roundTimer) clearTimeout(roundTimer);
+                updateScoresUI(data);
+                msg.innerText = data.winner === 0 ? "ROUND DRAW" : (data.winner === myId ? "VICTORY!" : "DEFEAT...");
+                msg.style.color = data.winner === myId ? "var(--success)" : (data.winner === 0 ? "#fff" : "var(--fail)");
+            }
+            if(data.type === 'GAME_OVER') {
+                const isWinner = data.winner === myId, isDraw = data.winner === 0;
+                if (isDraw) { msg.innerText = "🤝 THE DESTINY IS TIED"; msg.style.color = "#fff"; }
+                else { msg.innerText = isWinner ? "🏆 YOU ARE THE LEGEND" : "💀 DESTINY BROKEN"; msg.style.color = isWinner ? "var(--success)" : "var(--fail)"; }
+                progress.style.transition = 'none'; progress.style.width = '100%';
+                setTimeout(() => { progress.style.transition = 'width 4000ms linear'; progress.style.width = '0%'; }, 50);
+                let timeLeft = 4;
+                const exitInterval = setInterval(() => {
+                    timeLeft--;
+                    const resultTxt = isDraw ? "🤝 DRAW! " : (isWinner ? "🏆 WINNER! " : "💀 DEFEAT! ");
+                    msg.innerText = resultTxt + `LOBBY IN ${timeLeft}...`;
+                    if(timeLeft <= 0) { clearInterval(exitInterval); location.reload(); }
+                }, 1000);
+            }
+        };
+    }
+
+    function initGrids() {
+        const myCont = document.getElementById('my-grid'), oppCont = document.getElementById('opp-grid');
+        myCont.innerHTML = ''; oppCont.innerHTML = ''; myGrid = []; oppGrid = [];
+        for(let i=0; i<10; i++) {
+            const b1 = document.createElement('div'); b1.className = 'btn'; b1.innerText = runes[i];
+            b1.onpointerdown = (e) => { e.preventDefault(); handleTap(i); };
+            myCont.appendChild(b1); myGrid.push(b1);
+            const b2 = document.createElement('div'); b2.className = 'btn'; b2.innerText = runes[i];
+            oppCont.appendChild(b2); oppGrid.push(b2);
+        }
+    }
+
+    function clearGridEffects() { myGrid.forEach(b => b.className = 'btn'); oppGrid.forEach(b => b.className = 'btn'); }
+
+    function joinRoom(id) {
+        const roomId = id || document.getElementById('room-input').value;
+        if(roomId) socket.send(JSON.stringify({ type: 'JOIN_ROOM', roomId, profile: userProfile }));
+    }
+
+    async function renderRound(data) {
+        myProgress = 0; currentSeq = data.sequence; isPlaying = false;
+        msg.innerText = "WATCH!"; clearGridEffects();
+        await new Promise(r => setTimeout(r, 500));
+        for(let idx of currentSeq) {
+            myGrid[idx].classList.add('flash');
+            await new Promise(r => setTimeout(r, 200));
+            myGrid[idx].classList.remove('flash');
+            await new Promise(r => setTimeout(r, 100));
+        }
+        msg.innerText = "STRIKE!"; isPlaying = true;
+        const bar = document.getElementById('hub-progress');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        if(roundTimer) clearTimeout(roundTimer);
+        setTimeout(() => { bar.style.transition = `width 5000ms linear`; bar.style.width = '0%'; }, 50);
+        roundTimer = setTimeout(() => { if(isPlaying) { isPlaying = false; socket.send(JSON.stringify({ type: 'TAP', idx: -1 })); } }, 5100);
+    }
+
+    function handleTap(idx) {
+        if(!isPlaying) return;
+        const btn = myGrid[idx];
+        if(idx === currentSeq[myProgress]) {
+            btn.classList.add('correct'); setTimeout(() => btn.classList.remove('correct'), 150);
+            myProgress++; socket.send(JSON.stringify({ type: 'TAP', idx }));
+            if(myProgress === currentSeq.length) isPlaying = false;
+        } else {
+            btn.classList.add('wrong'); isPlaying = false; socket.send(JSON.stringify({ type: 'TAP', idx: -1 }));
+        }
+    }
+
+    function renderRoomList(rooms) {
+        const container = document.getElementById('room-list');
+        container.innerHTML = '';
+        if(rooms.length === 0) { container.innerHTML = '<div style="font-size:12px; color:#444; text-align:center; padding:20px;">NO ACTIVE ARENAS</div>'; return; }
+        rooms.forEach(room => {
+            const isFull = room.playerCount >= 2;
+            const item = document.createElement('div');
+            item.className = 'room-item';
+            if(isFull) item.style.opacity = "0.4";
+            item.innerHTML = `
+                <div style="display:flex; flex-direction:column; text-align:left;">
+                    <span class="arena-id">ARENA #${room.id}</span>
+                    <span class="arena-count">WARRIORS: ${room.playerCount} / 2</span>
+                </div>
+                <button class="btn-join-small ${isFull ? 'btn-full' : ''}">${isFull ? 'FULL' : 'ENTER'}</button>
+            `;
+            if(!isFull) item.onclick = () => joinRoom(room.id);
+            container.appendChild(item);
+        });
+    }
+
+    function updateScoresUI(data) {
+        const p1Score = myId===1?data.p1Score:data.p2Score, p2Score = myId===1?data.p2Score:data.p1Score;
+        const p1El = document.getElementById('p1-score'), p2El = document.getElementById('p2-score');
+        if(p1El.innerText != p1Score) { p1El.innerText = p1Score; p1El.classList.add('animate-pop'); setTimeout(()=>p1El.classList.remove('animate-pop'), 400); }
+        if(p2El.innerText != p2Score) { p2El.innerText = p2Score; p2El.classList.add('animate-pop'); setTimeout(()=>p2El.classList.remove('animate-pop'), 400); }
+    }
+</script>
+</body>
+</html>
